@@ -43,7 +43,7 @@ public:
         return players.begin()->first;
     }
 
-    void SendMessageToPlayer(DuelPlayer*dp, char*msg);
+    void SendMessageToPlayer(DuelPlayer*dp, wchar_t*msg);
     void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto);
     template<typename ST>
     void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st)
