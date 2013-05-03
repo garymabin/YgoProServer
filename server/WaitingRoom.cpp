@@ -121,13 +121,13 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 
     //STOC_HS_PlayerEnter scpe;
-    BufferIO::CopyWStr("read the chat!", scpe.name, 20);
+    BufferIO::CopyWStr("等待中...", scpe.name, 20);
     scpe.pos = 1;
     SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 
     usleep(50000);
-    SendMessageToPlayer(dp,"Welcome to the CheckMate server!");
-    SendMessageToPlayer(dp,"Type !tag to enter a tag duel, !single for a single duel or !match");
+    //SendMessageToPlayer(dp,"欢迎使用自动匹配系统!");
+    //SendMessageToPlayer(dp,"输入 single 进入单局模式, match进入比赛模式, 或者输入 tag 进行TAG双打");
 
     updateObserversNum();
 
@@ -140,10 +140,11 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     char name[20],message[256];
     BufferIO::CopyWStr(dp->name,name,20);
     std::string username(name);
-    sprintf(message, "This is a ranked server. You have %d points.",Users::getInstance()->getScore(username));
+    sprintf(message, "积分系统内测中, 你拥有 %d 点积分, 这些积分以后可能会重置",Users::getInstance()->getScore(username));
     SendMessageToPlayer(dp,message);
-    SendMessageToPlayer(dp,"to register and login, put your password near the username. example username$password");
-
+    //SendMessageToPlayer(dp,"到正式版时可能会重置");
+    ExtractPlayer(dp);
+    return roomManager->InsertPlayer(dp,MODE_MATCH);
 
 
 }
