@@ -137,7 +137,8 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     scpc.status = (dp->type << 4) | PLAYERCHANGE_READY;
     SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
 
-    char name[20],message[256];
+    char name[20]
+    wchar_t message[256];
     BufferIO::CopyWStr(dp->name,name,20);
     std::string username(name);
     swprintf(message, L"积分系统内测中, 你拥有 %d 点积分, 这些积分以后可能会重置", Users::getInstance()->getScore(username));
