@@ -144,7 +144,7 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     SendMessageToPlayer(dp,message);
     //SendMessageToPlayer(dp,"到正式版时可能会重置");
     ExtractPlayer(dp);
-    return roomManager->InsertPlayer(dp,MODE_MATCH);
+    roomManager->InsertPlayer(dp,MODE_MATCH);
 
 
 }
