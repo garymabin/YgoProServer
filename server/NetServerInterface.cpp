@@ -12,7 +12,7 @@ roomManager(roomManager),gameServer(gameServer),last_sent(0)
 
 }
 
-void CMNetServerInterface::SendMessageToPlayer(DuelPlayer*dp, char*msg)
+void CMNetServerInterface::SendMessageToPlayer(DuelPlayer*dp, wchar_t*msg)
 {
     STOC_Chat scc;
     scc.player = dp->type;
