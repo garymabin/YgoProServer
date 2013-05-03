@@ -43,7 +43,7 @@ void CMNetServer::SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* 
                 wchar_t buffer[256];
                 BufferIO::CopyWStr(it->first->name, name,20);
                 int score = Users::getInstance()->getScore(std::string(name));
-                swprintf(buffer, 256, L"%s ÓĞ %d µã»ı·Ö",name,score);
+                swprintf(buffer, 256, L"%s æœ‰ %d ç‚¹ç§¯åˆ†",name,score);
                 SendMessageToPlayer(dp,buffer);
             }
         }
@@ -60,7 +60,7 @@ void CMNetServer::auto_idle_cb(evutil_socket_t fd, short events, void* arg)
     {
         if(it->first->type != NETPLAYER_TYPE_OBSERVER && !(it->second.isReady))
         {
-            that->SendMessageToPlayer(it->first, L"ÓÉÓÚ³¤Ê±¼äÃ»ÓĞ×¼±¸£¬Äú±»ÒÆ¶¯µ½¹ÛÕ½Õß");
+            that->SendMessageToPlayer(it->first, L"ç”±äºé•¿æ—¶é—´æ²¡æœ‰å‡†å¤‡ï¼Œæ‚¨è¢«ç§»åŠ¨åˆ°è§‚æˆ˜è€…");
             that->toObserver(it->first);
 
         }

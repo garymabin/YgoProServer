@@ -76,7 +76,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp)
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
-        waitingRoom->SendMessageToPlayer(dp, L"·şÎñÆ÷ÂúÔ±");
+        waitingRoom->SendMessageToPlayer(dp, L"æœåŠ¡å™¨æ»¡å‘˜");
         //gameServer->DisconnectPlayer(dp);
         return false;
     }
@@ -142,7 +142,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp,unsigned char mode)
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
-        waitingRoom->SendMessageToPlayer(dp, L"·şÎñÆ÷ÂúÔ±");
+        waitingRoom->SendMessageToPlayer(dp, L"æœåŠ¡å™¨æ»¡å‘˜");
         return false;
     }
 
