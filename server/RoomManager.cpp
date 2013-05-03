@@ -76,7 +76,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp)
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
-        waitingRoom->SendMessageToPlayer(dp,"The server is full, please wait.");
+        waitingRoom->SendMessageToPlayer(dp, L"服务器满员");
         //gameServer->DisconnectPlayer(dp);
         return false;
     }
@@ -142,7 +142,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp,unsigned char mode)
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
-        waitingRoom->SendMessageToPlayer(dp,"The server is full, please wait.");
+        waitingRoom->SendMessageToPlayer(dp, L"服务器满员");
         return false;
     }
 

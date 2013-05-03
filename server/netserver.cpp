@@ -39,10 +39,11 @@ void CMNetServer::SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* 
             {
                 if(it->first->type == NETPLAYER_TYPE_OBSERVER)
                     continue;
-                char buffer[256],name[20];
+                char name[20];
+                wchar_t buffer[256];
                 BufferIO::CopyWStr(it->first->name, name,20);
                 int score = Users::getInstance()->getScore(std::string(name));
-                sprintf(buffer, "%s has %d points",name,score);
+                swprintf(buffer, 256, L"%s 有 %d 点积分",name,score);
                 SendMessageToPlayer(dp,buffer);
             }
         }
@@ -59,7 +60,7 @@ void CMNetServer::auto_idle_cb(evutil_socket_t fd, short events, void* arg)
     {
         if(it->first->type != NETPLAYER_TYPE_OBSERVER && !(it->second.isReady))
         {
-            that->SendMessageToPlayer(it->first,"You are moved to spectators for not being ready");
+            that->SendMessageToPlayer(it->first, L"由于长时间没有准备，您被移动到观战者");
             that->toObserver(it->first);
 
         }
