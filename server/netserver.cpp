@@ -39,7 +39,7 @@ void CMNetServer::SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* 
             {
                 if(it->first->type == NETPLAYER_TYPE_OBSERVER)
                     continue;
-                char name[20];
+                wchar_t name[20];
                 wchar_t buffer[256];
                 BufferIO::CopyWStr(it->first->name, name,20);
                 int score = Users::getInstance()->getScore(std::wstring(name));
