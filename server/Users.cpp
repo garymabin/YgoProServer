@@ -88,8 +88,8 @@ std::wstring Users::login(std::wstring loginString)
     }
     catch(std::exception& ex)
     {
-        username ="Player";
-        password = "";
+        username = L"Player";
+        password = L"";
     }
 
     std::lock_guard<std::mutex> guard(usersMutex);
@@ -113,7 +113,7 @@ std::wstring Users::login(std::wstring username, std::wstring password)
     }
 
     UserData* d = users[usernamel];
-    if(usernamel == "duelista" || usernamel == "player" || d->password=="" || d->password==password )
+    if(usernamel == L"duelista" || usernamel == L"player" || d->password==L"" || d->password==password )
     {
         d->password = password;
         time(&users[usernamel]->last_login);
@@ -197,7 +197,7 @@ std::wstring Users::getFirstAvailableUsername(std::wstring base)
             return possibleUsername;
         }
     }*/
-    return "Player";
+    return L"Player";
 }
 
 void Users::SaveDB()
