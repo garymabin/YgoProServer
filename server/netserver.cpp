@@ -319,7 +319,7 @@ void CMNetServer::Victory(unsigned char winner)
     }
     if(mode == MODE_SINGLE || mode == MODE_MATCH)
     {
-        char win[20], lose[20];
+        wchar_t win[20], lose[20];
 
         BufferIO::CopyWStr(_players[winner]->name,win,20);
         BufferIO::CopyWStr(_players[1-winner]->name,lose,20);
