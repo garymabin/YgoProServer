@@ -14,7 +14,7 @@ Users::Users()
 
     t1 = std::thread(SaveThread,this);
 }
-bool Users::validLoginString(std::string loginString)
+bool Users::validLoginString(std::wstring loginString)
 {
     try
     {
@@ -43,46 +43,46 @@ void Users::SaveThread(Users* that)
     }
 }
 
-std::pair<std::string,std::string> Users::splitLoginString(std::string loginString)
+std::pair<std::wstring,std::wstring> Users::splitLoginString(std::wstring loginString)
 {
     printf("splitto %s\n",loginString.c_str());
-    std::string username;
-    std::string password="";
+    std::wstring username;
+    std::wstring password="";
 
     auto found=loginString.find('|');
-    if(found != std::string::npos)
+    if(found != std::wstring::npos)
         throw std::exception();
 
     found=loginString.find('$');
-    if(found == std::string::npos)
+    if(found == std::wstring::npos)
         username = loginString;
     else
     {
         username = loginString.substr(0,found);
-        password = loginString.substr(found+1,std::string::npos);
+        password = loginString.substr(found+1,std::wstring::npos);
     }
 
-    //std::string legal="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%@![]{}\\/*:.,&-_à‘Ô?Ë+^";
+    //std::wstring legal="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%@![]{}\\/*:.,&-_à‘Ô?Ë+^";
     //found = username.find_first_not_of(legal);
-    //if(found != std::string::npos)
+    //if(found != std::wstring::npos)
     //    throw std::exception();
 
     //if (username.length()<2 || username.length() > 20)
     //    throw std::exception();
 
-    return std::pair<std::string,std::string> (username,password);
+    return std::pair<std::wstring,std::wstring> (username,password);
 }
 
 
 
 
-std::string Users::login(std::string loginString)
+std::wstring Users::login(std::wstring loginString)
 {
-    std::string username;
-    std::string password;
+    std::wstring username;
+    std::wstring password;
     try
     {
-        std::pair<std::string,std::string> userpass = splitLoginString(loginString);
+        std::pair<std::wstring,std::wstring> userpass = splitLoginString(loginString);
         username = userpass.first;
         password = userpass.second;
     }
@@ -97,10 +97,10 @@ std::string Users::login(std::string loginString)
     return login(username,password);
 }
 
-std::string Users::login(std::string username, std::string password)
+std::wstring Users::login(std::wstring username, std::wstring password)
 {
     std::cout<<"Tento il login con "<<username<<" e "<<password<<std::endl;
-    std::string usernamel=username;
+    std::wstring usernamel=username;
 
     std::transform(usernamel.begin(), usernamel.end(), usernamel.begin(), ::tolower);
     std::cout<<"Tento il login con "<<usernamel<<" e "<<password<<std::endl;
@@ -125,7 +125,7 @@ std::string Users::login(std::string username, std::string password)
 
 }
 
-int Users::getScore(std::string username)
+int Users::getScore(std::wstring username)
 {
     std::transform(username.begin(), username.end(), username.begin(), ::tolower);
     std::lock_guard<std::mutex> guard(usersMutex);
@@ -134,7 +134,7 @@ int Users::getScore(std::string username)
 }
 
 
-void Users::Victory(std::string win, std::string los)
+void Users::Victory(std::wstring win, std::wstring los)
 {
     std::transform(win.begin(), win.end(), win.begin(), ::tolower);
     std::transform(los.begin(), los.end(), los.begin(), ::tolower);
@@ -149,7 +149,7 @@ void Users::Victory(std::string win, std::string los)
         users[los]->score = 1000;
     std::cout << win << "ha: "<<users[win]->score;
 }
-void Users::Victory(std::string win1, std::string win2,std::string los1, std::string los2)
+void Users::Victory(std::wstring win1, std::wstring win2,std::wstring los1, std::wstring los2)
 {
     std::transform(win1.begin(), win1.end(), win1.begin(), ::tolower);
     std::transform(los1.begin(), los1.end(), los1.begin(), ::tolower);
@@ -183,7 +183,7 @@ Users* Users::getInstance()
     static Users u;
     return &u;
 }
-std::string Users::getFirstAvailableUsername(std::string base)
+std::wstring Users::getFirstAvailableUsername(std::wstring base)
 {
     /*base = base.substr(0,17);
     for(int i = 1; i < 1000; i++)
@@ -191,7 +191,7 @@ std::string Users::getFirstAvailableUsername(std::string base)
         std::ostringstream ostr;
         ostr << i;
 
-        std::string possibleUsername = base+ostr.str();
+        std::wstring possibleUsername = base+ostr.str();
         if(users.find(possibleUsername) == users.end())
         {
             return possibleUsername;
@@ -214,12 +214,12 @@ void Users::LoadDB()
 {
     std::cout<<"LoadDB"<<std::endl;
     std::ifstream inf("users.txt");
-    std::string username;
+    std::wstring username;
     while(!std::getline(inf, username, '|').eof())
     {
-        std::string password;
-        std::string iscore;
-        std::string slast_login;
+        std::wstring password;
+        std::wstring iscore;
+        std::wstring slast_login;
         unsigned int score;
         time_t last_login;
         std::getline(inf, password, '|');

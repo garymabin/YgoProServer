@@ -215,7 +215,7 @@ void WaitingRoom::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len)
         char name[20];
         BufferIO::CopyWStr(pkt->name,name,20);
         Users* u = Users::getInstance();
-        std::string username = u->login(name);
+        std::wstring username = u->login(name);
 
         BufferIO::CopyWStr(username.c_str(), dp->name, 20);
 
