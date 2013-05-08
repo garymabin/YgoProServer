@@ -62,13 +62,13 @@ std::pair<std::string,std::string> Users::splitLoginString(std::string loginStri
         password = loginString.substr(found+1,std::string::npos);
     }
 
-    std::string legal="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%@![]{}\\/*:.,&-_à‘Ô?Ë+^";
-    found = username.find_first_not_of(legal);
-    if(found != std::string::npos)
-        throw std::exception();
+    //std::string legal="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%@![]{}\\/*:.,&-_à‘Ô?Ë+^";
+    //found = username.find_first_not_of(legal);
+    //if(found != std::string::npos)
+    //    throw std::exception();
 
-    if (username.length()<2 || username.length() > 20)
-        throw std::exception();
+    //if (username.length()<2 || username.length() > 20)
+    //    throw std::exception();
 
     return std::pair<std::string,std::string> (username,password);
 }
