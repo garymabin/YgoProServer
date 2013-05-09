@@ -209,7 +209,7 @@ void CMNetServer::createGame()
     info.draw_count=1;
     info.no_check_deck=false;
     info.start_hand=5;
-    info.lflist=0;
+    info.lflist=1;
     info.time_limit=300;
     info.start_lp=8000;
     info.enable_priority=false;
