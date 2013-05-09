@@ -137,7 +137,7 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     scpc.status = (dp->type << 4) | PLAYERCHANGE_READY;
     SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
 
-    char name[20];
+    wchar_t name[20];
     wchar_t message[256];
     BufferIO::CopyWStr(dp->name,name,20);
     std::wstring username(name);
