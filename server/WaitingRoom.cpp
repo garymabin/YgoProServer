@@ -140,7 +140,7 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     char name[20];
     wchar_t message[256];
     BufferIO::CopyWStr(dp->name,name,20);
-    std::string username(name);
+    std::wstring username(name);
     swprintf(message, 256, L"积分系统内测中, 你拥有 %d 点积分, 这些积分以后可能会重置", Users::getInstance()->getScore(username));
     SendMessageToPlayer(dp,message);
     //SendMessageToPlayer(dp,"到正式版时可能会重置");
