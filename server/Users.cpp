@@ -215,15 +215,15 @@ void Users::LoadDB()
     std::cout<<"LoadDB"<<std::endl;
     std::wifstream inf("users.txt");
     std::wstring username;
-    while(!std::getline(inf, username, '|').eof())
+    while(!std::getline(inf, username, L'|').eof())
     {
         std::wstring password;
         std::wstring iscore;
         std::wstring slast_login;
         unsigned int score;
         time_t last_login;
-        std::getline(inf, password, '|');
-        std::getline(inf, iscore,'|');
+        std::getline(inf, password, L'|');
+        std::getline(inf, iscore,L'|');
         std::getline(inf,slast_login);
         score = stoi(iscore);
         last_login = stoul(slast_login);
