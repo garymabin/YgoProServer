@@ -203,11 +203,11 @@ std::wstring Users::getFirstAvailableUsername(std::wstring base)
 void Users::SaveDB()
 {
     //return;
-    std::ofstream inf("users.txt");
+    std::wofstream inf("users.txt");
     for(auto it = users.cbegin(); it!=users.cend(); ++it)
     {
-        inf<<it->second->username<<"|"<<it->second->password<<"|"<<it->second->score;
-        inf << "|"<<it->second->last_login<<std::endl;
+        inf<<it->second->username<<L"|"<<it->second->password<<L"|"<<it->second->score;
+        inf << L"|"<<it->second->last_login<<std::endl;
     }
 }
 void Users::LoadDB()
