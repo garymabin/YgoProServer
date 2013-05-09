@@ -45,7 +45,7 @@ void Users::SaveThread(Users* that)
 
 std::pair<std::wstring,std::wstring> Users::splitLoginString(std::wstring loginString)
 {
-    printf("splitto %s\n",loginString.c_str());
+    //printf("splitto %s\n",loginString.c_str());
     std::wstring username;
     std::wstring password;
 
@@ -99,11 +99,11 @@ std::wstring Users::login(std::wstring loginString)
 
 std::wstring Users::login(std::wstring username, std::wstring password)
 {
-    std::cout<<"Tento il login con "<<username<<" e "<<password<<std::endl;
+    //std::cout<<"Tento il login con "<<username<<" e "<<password<<std::endl;
     std::wstring usernamel=username;
 
     std::transform(usernamel.begin(), usernamel.end(), usernamel.begin(), ::tolower);
-    std::cout<<"Tento il login con "<<usernamel<<" e "<<password<<std::endl;
+    //std::cout<<"Tento il login con "<<usernamel<<" e "<<password<<std::endl;
     if(users.find(usernamel) == users.end())
     {
         std::cout<<usernamel<<std::endl;
@@ -129,7 +129,7 @@ int Users::getScore(std::wstring username)
 {
     std::transform(username.begin(), username.end(), username.begin(), ::tolower);
     std::lock_guard<std::mutex> guard(usersMutex);
-    printf("%s ha %d punti\n",username.c_str(),users[username]->score);
+    //printf("%s ha %d punti\n",username.c_str(),users[username]->score);
     return users[username]->score;
 }
 
@@ -147,7 +147,7 @@ void Users::Victory(std::wstring win, std::wstring los)
     users[los]->score = losescore - 100*losescore/winscore;
     if(users[los]->score < 1000)
         users[los]->score = 1000;
-    std::cout << win << "ha: "<<users[win]->score;
+    //std::cout << win << "ha: "<<users[win]->score;
 }
 void Users::Victory(std::wstring win1, std::wstring win2,std::wstring los1, std::wstring los2)
 {

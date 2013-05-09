@@ -43,7 +43,7 @@ void CMNetServer::SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* 
                 wchar_t buffer[256];
                 BufferIO::CopyWStr(it->first->name, name,20);
                 int score = Users::getInstance()->getScore(std::wstring(name));
-                swprintf(buffer, 256, L"%s 有 %d 点积分",name,score);
+                swprintf(buffer, 256, L"%S 有 %d 点积分",name,score);
                 SendMessageToPlayer(dp,buffer);
             }
         }
@@ -323,7 +323,7 @@ void CMNetServer::Victory(unsigned char winner)
 
         BufferIO::CopyWStr(_players[winner]->name,win,20);
         BufferIO::CopyWStr(_players[1-winner]->name,lose,20);
-        log(INFO,"SingleDuel, winner: %s, loser: %s\n",win,lose);
+        //log(INFO,"SingleDuel, winner: %s, loser: %s\n",win,lose);
         std::wstring wins(win), loses(lose);
         Users::getInstance()->Victory(wins,loses);
     }
@@ -347,7 +347,7 @@ void CMNetServer::Victory(unsigned char winner)
 
         }
         Users::getInstance()->Victory(std::wstring(win1),std::wstring(win2),std::wstring(lose1),std::wstring(lose2));
-        log(INFO,"Tagduel finished: winners %s and %s, losers: %s and %s\n",win1,win2,lose1,lose2);
+        //log(INFO,"Tagduel finished: winners %s and %s, losers: %s and %s\n",win1,win2,lose1,lose2);
     }
 }
 

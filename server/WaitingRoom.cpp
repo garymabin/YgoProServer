@@ -219,7 +219,7 @@ void WaitingRoom::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len)
 
         BufferIO::CopyWStr(username.c_str(), dp->name, 20);
 
-        log(INFO,"WaitingRoom:Player joined %s \n",name);
+        //log(INFO,"WaitingRoom:Player joined %s \n",name);
         break;
     }
     case CTOS_CHAT:
