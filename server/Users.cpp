@@ -47,13 +47,13 @@ std::pair<std::wstring,std::wstring> Users::splitLoginString(std::wstring loginS
 {
     printf("splitto %s\n",loginString.c_str());
     std::wstring username;
-    std::wstring password="";
+    std::wstring password;
 
-    auto found=loginString.find('|');
+    auto found=loginString.find(L'|');
     if(found != std::wstring::npos)
         throw std::exception();
 
-    found=loginString.find('$');
+    found=loginString.find(L'$');
     if(found == std::wstring::npos)
         username = loginString;
     else
@@ -213,7 +213,7 @@ void Users::SaveDB()
 void Users::LoadDB()
 {
     std::cout<<"LoadDB"<<std::endl;
-    std::ifstream inf("users.txt");
+    std::wifstream inf("users.txt");
     std::wstring username;
     while(!std::getline(inf, username, '|').eof())
     {
@@ -227,11 +227,11 @@ void Users::LoadDB()
         std::getline(inf,slast_login);
         score = stoi(iscore);
         last_login = stoul(slast_login);
-        std::cout<<"adding user "<<username<<" pass: "<<password<< "score: "<<score<<std::endl;
-        if(!validLoginString(username+"$"+password))
+        //std::cout<<"adding user "<<username<<" pass: "<<password<< "score: "<<score<<std::endl;
+        if(!validLoginString(username+L"$"+password))
             continue;
 
-        splitLoginString(username+"$"+password);
+        splitLoginString(username+L"$"+password);
         UserData* ud = new UserData(username,password,score);
         ud->last_login = last_login;
         std::transform(username.begin(), username.end(), username.begin(), ::tolower);
