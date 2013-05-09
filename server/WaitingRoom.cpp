@@ -212,7 +212,7 @@ void WaitingRoom::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len)
     case CTOS_PLAYER_INFO:
     {
         CTOS_PlayerInfo* pkt = (CTOS_PlayerInfo*)pdata;
-        char name[20];
+        wchar_t name[20];
         BufferIO::CopyWStr(pkt->name,name,20);
         Users* u = Users::getInstance();
         std::wstring username = u->login(name);
