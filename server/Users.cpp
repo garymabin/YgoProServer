@@ -106,7 +106,7 @@ std::wstring Users::login(std::wstring username, std::wstring password)
     //std::cout<<"Tento il login con "<<usernamel<<" e "<<password<<std::endl;
     if(users.find(usernamel) == users.end())
     {
-        std::cout<<usernamel<<std::endl;
+        //std::cout<<usernamel<<std::endl;
         users[usernamel] = new UserData(username,password);
         time(&users[usernamel]->last_login);
         return username;
