@@ -5,6 +5,7 @@
 #include <thread>
 #include <exception>
 #include <algorithm>
+#include <unistd.h>
 namespace ygo
 {
 Users::Users()
@@ -204,6 +205,7 @@ void Users::SaveDB()
 {
     //return;
     std::wofstream inf("users.txt");
+    inf.imbue(std::locale("C.UTF-8"));
     for(auto it = users.cbegin(); it!=users.cend(); ++it)
     {
         inf<<it->second->username<<L"|"<<it->second->password<<L"|"<<it->second->score;
@@ -214,6 +216,7 @@ void Users::LoadDB()
 {
     std::cout<<"LoadDB"<<std::endl;
     std::wifstream inf("users.txt");
+    inf.imbue(std::locale("C.UTF-8"));
     std::wstring username;
     while(!std::getline(inf, username, L'|').eof())
     {
