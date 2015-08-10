@@ -25,10 +25,10 @@ CC = gcc
 CPP = g++
 
 # library paths
-LIBS = 
+LIBS =
 
 # compile flags
-LDFLAGS = -levent -llua5.2 -lsqlite3 -levent_pthreads
+LDFLAGS = -levent -llua5.2 -lsqlite3 -levent_pthreads -lpthread
 
 
 server: $(OUT)
