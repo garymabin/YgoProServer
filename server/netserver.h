@@ -14,16 +14,11 @@ namespace ygo
 class GameServer;
 class RoomManager;
 
-
-
-
-
-
 class CMNetServer:public CMNetServerInterface
 {
-    public:
+public:
     unsigned char mode;
-    enum State {WAITING,FULL,PLAYING,ZOMBIE,DEAD};
+    enum State { WAITING, FULL, PLAYING,ZOMBIE, DEAD};
     State state;
 private:
     static void DuelTimer(evutil_socket_t fd, short events, void* arg);
@@ -38,8 +33,9 @@ private:
 
     DuelMode* duel_mode;
 
-
     int numPlayers;
+    
+    std::string serverName;
 
     void playerConnected(DuelPlayer* dp);
     void playerDisconnected(DuelPlayer* dp);
@@ -51,13 +47,14 @@ private:
 public:
 
     CMNetServer(RoomManager*roomManager,GameServer*,unsigned char mode);
+    CMNetServer(RoomManager*roomManager,GameServer*,unsigned char mode, const char* name, HostInfo *pInfo);
     void LeaveGame(DuelPlayer* dp);
     bool StartServer(unsigned short port);
     bool StartBroadcast();
     void StopServer();
     void StopBroadcast();
     void StopListen();
-    void createGame();
+    void createGame(const char* name, HostInfo *pInfo);
     void DisconnectPlayer(DuelPlayer* dp);
     void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
 

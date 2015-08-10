@@ -49,7 +49,7 @@ int RoomManager::getNumPlayers()
     return risultato;
 }
 
-CMNetServer* RoomManager::getFirstAvailableServer(unsigned char mode)
+CMNetServer* RoomManager::getFirstAvailableRoom(unsigned char mode)
 {
     int i = 0;
     log(INFO,"analizzo la lista server\n");
@@ -65,14 +65,14 @@ CMNetServer* RoomManager::getFirstAvailableServer(unsigned char mode)
         i++;
     }
     log(INFO,"Server non trovato, creo uno nuovo \n");
-    return createServer(mode);
+    return createRoom(mode);
 }
 
 bool RoomManager::InsertPlayer(DuelPlayer*dp)
 {
 
     //tfirst room
-    CMNetServer* netServer = getFirstAvailableServer();
+    CMNetServer* netServer = getFirstAvailableRoom();
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
@@ -138,7 +138,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp,unsigned char mode)
 {
 
     //true is success
-    CMNetServer* netServer = getFirstAvailableServer(mode);
+    CMNetServer* netServer = getFirstAvailableRoom(mode);
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
@@ -152,7 +152,40 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp,unsigned char mode)
     return true;
 }
 
-CMNetServer* RoomManager::getFirstAvailableServer()
+bool RoomManager::CreateOrJoinRoom(DuelPlayer*dp, HostInfo *pInfo, const char* name)
+{
+    CMNetServer* room = FindRoom(pInfo, name);
+    if (room == nullptr)
+    {
+        room = CreateRoom(pInfo, name);
+    }
+    dp->netServer = room;
+    netServer->InsertPlayer(dp);
+}
+
+static inline bool compareHostInfo(HostInfo *pInfo1, HostInfo * pInfo2)
+{
+    return memcmp(pInfo1, pInfo2, sizeof(HostInfo)) == 0;
+}
+    
+
+CMNetServer* RoomManager::FindRoom(HostInfo *pInfo, const char* name)
+{
+    int i = 0;
+    log(INFO,"try to find specific room\n");
+    for(auto it =elencoServer.begin(); it!=elencoServer.end(); ++it)
+    {
+        CMNetServer *p = *it;
+        if(compareHostInfo(&p->duel_mode->host_info, pInfo) && (strcmp(name, p->serverName.c_str()) == 0))
+        {
+            return *it;
+        }
+        i++;
+    } 
+    return nullptr;
+}
+
+CMNetServer* RoomManager::getFirstAvailableRoom()
 {
     int i = 0;
     log(INFO,"analizzo la lista server\n");
@@ -166,20 +199,32 @@ CMNetServer* RoomManager::getFirstAvailableServer()
         }
         i++;
     }
-
-
     log(INFO,"Server non trovato, creo uno nuovo \n");
-
-    return createServer(MODE_SINGLE);
-    //netServer.gameServer=
+    return createRoom(MODE_SINGLE);
 }
-CMNetServer* RoomManager::createServer(unsigned char mode)
+
+CMNetServer* RoomManager::createRoom(unsigned char mode)
 {
     if(elencoServer.size() >= 500)
     {
         return nullptr;
     }
-    CMNetServer *netServer = new CMNetServer(this,gameServer,mode);
+    CMNetServer *netServer = new CMNetServer(this, gameServer, mode);
+
+    elencoServer.push_back(netServer);
+
+    Statistics::getInstance()->setNumRooms(elencoServer.size());
+
+    return netServer;
+}
+
+CMNetServer* RoomManager::createRoom(HostInfo *pInfo, const char *name)
+{
+    if(elencoServer.size() >= 500)
+    {
+        return nullptr;
+    }
+    CMNetServer *netServer = new CMNetServer(this, gameServer, pInfo->mode, name, pInfo);
 
     elencoServer.push_back(netServer);
 
@@ -212,6 +257,5 @@ void RoomManager::removeDeadRooms()
     }
     Statistics::getInstance()->setNumRooms(elencoServer.size());
 }
-
 
 }

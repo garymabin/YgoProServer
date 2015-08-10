@@ -7,13 +7,28 @@
 #include "Users.h"
 namespace ygo
 {
-CMNetServer::CMNetServer(RoomManager*roomManager,GameServer*gameServer,unsigned char mode)
+CMNetServer::CMNetServer(RoomManager* roomManager, GameServer* gameServer, unsigned char mode)
     :CMNetServerInterface(roomManager,gameServer),mode(mode),duel_mode(0)
 {
-    createGame();
+    HostInfo info;
+    info.rule=0;
+    info.mode=mode;
+    info.draw_count=1;
+    info.no_check_deck=false;
+    info.start_hand=5;
+    info.lflist=1;
+    info.time_limit=300;
+    info.start_lp=8000;
+    info.enable_priority=false;
+    info.no_shuffle_deck=false;
+    createGame("random", &info);
 }
 
-
+CMNetServer::CMNetServer(RoomManager* roomManager, GameServer* gameServer, unsigned char mode, const char* name, HostInfo* pInfo)
+    :CMNetServerInterface(roomManager,gameServer),mode(mode),duel_mode(0)
+{
+    createGame(name, pInfo);
+}
 
 void CMNetServer::SendPacketToPlayer(DuelPlayer* dp, unsigned char proto)
 {
@@ -142,7 +157,7 @@ void CMNetServer::updateServerState()
     if(auto_idle)
         event_del(auto_idle);
 
-    if(getNumDuelPlayers() < getMaxDuelPlayers() &&state==FULL)
+    if(getNumDuelPlayers() < getMaxDuelPlayers() && state == FULL)
     {
         setState(WAITING);
         log(INFO,"server not full\n");
@@ -154,7 +169,7 @@ void CMNetServer::updateServerState()
         destroyGame();
         setState(DEAD);
     }
-    if(getNumDuelPlayers()>=getMaxDuelPlayers() && state==WAITING)//
+    if(getNumDuelPlayers() >= getMaxDuelPlayers() && state == WAITING)//
     {
         log(INFO,"server full\n");
         setState(FULL);
@@ -166,11 +181,11 @@ void CMNetServer::updateServerState()
 
 void CMNetServer::playerDisconnected(DuelPlayer* dp )
 {
-    if(players.find(dp)!=players.end())
+    if(players.find(dp) != players.end())
         players.erase(dp);
-    numPlayers=players.size();
+    numPlayers = players.size();
 
-    log(INFO,"giocatori connessi:%d\n",numPlayers);
+    log(INFO,"current players:%d\n",numPlayers);
     updateServerState();
 }
 void CMNetServer::DuelTimer(evutil_socket_t fd, short events, void* arg)
@@ -187,7 +202,7 @@ void CMNetServer::DuelTimer(evutil_socket_t fd, short events, void* arg)
         TagDuel::TagTimer(fd,events,that->duel_mode);
 
 }
-void CMNetServer::createGame()
+void CMNetServer::createGame(const char* name, HostInfo *pInfo)
 {
     event_base* net_evbase=roomManager->net_evbase;
     auto_idle = event_new(net_evbase, 0, EV_TIMEOUT , CMNetServer::auto_idle_cb, this);
@@ -203,29 +218,20 @@ void CMNetServer::createGame()
     BufferIO::CopyWStr(L"", duel_mode->name, 20);
     BufferIO::CopyWStr(L"", duel_mode->pass, 20);
 
-    HostInfo info;
-    info.rule=0;
-    info.mode=mode;
-    info.draw_count=1;
-    info.no_check_deck=false;
-    info.start_hand=5;
-    info.lflist=1;
-    info.time_limit=300;
-    info.start_lp=8000;
-    info.enable_priority=false;
-    info.no_shuffle_deck=false;
+    memcpy(&duel_mode->host_info, pInfo, sizeof(HostInfo));
+    serverName.append(name);
+
     unsigned int hash = 1;
     for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit)
     {
-        if(info.lflist == lfit->hash)
+        if(duel_mode->host_info.lflist == lfit->hash)
         {
-            hash = info.lflist;
+            hash = duel_mode->host_info.lflist;
             break;
         }
     }
     if(hash == 1)
-        info.lflist = deckManager._lfList[0].hash;
-    duel_mode->host_info = info;
+        duel_mode->host_info.lflist = deckManager._lfList[0].hash;
     duel_mode->setNetServer(this);
     setState(WAITING);
     numPlayers=0;

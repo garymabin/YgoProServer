@@ -11,6 +11,8 @@
 
 #include "netserver.h"
 
+const unsigned short PRO_VERSION = 0x12f0;
+
 namespace ygo {
 
 class GameServer {

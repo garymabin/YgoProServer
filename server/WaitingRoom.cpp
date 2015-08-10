@@ -2,11 +2,31 @@
 #include "GameServer.h"
 #include "debug.h"
 #include "Users.h"
+#include "str"
+#include <string>
+#include <sstream>
+#include <vector>
+
 namespace ygo
 {
 int WaitingRoom::minSecondsWaiting=4;
 int WaitingRoom::maxSecondsWaiting=6;
 
+
+static std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+static std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 
 WaitingRoom::WaitingRoom(RoomManager*roomManager,GameServer*gameServer):
     CMNetServerInterface(roomManager,gameServer),cicle_users(0)
@@ -72,10 +92,8 @@ void WaitingRoom::updateObserversNum()
     {
         SendPacketToPlayer(it->first, STOC_HS_WATCH_CHANGE, scwc);
     }
-
-
-
 }
+
 void WaitingRoom::InsertPlayer(DuelPlayer* dp)
 {
     dp->netServer=this;
@@ -126,8 +144,11 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 
     usleep(50000);
-    //SendMessageToPlayer(dp,"欢迎使用自动匹配系统!");
-    //SendMessageToPlayer(dp,"输入 single 进入单局模式, match进入比赛模式, 或者输入 tag 进行TAG双打");
+    //wchar_t message[20];
+    //swprintf(message, 256, L"欢迎进入自动匹配系统");
+    SendMessageToPlayer(dp,L"欢迎进入自动匹配系统");
+    //swprintf(message, 256, L"输入 ！single 进入单局模式, ！match进入比赛模式, 或者输入 ！tag 进行TAG双打");
+    SendMessageToPlayer(dp,L"输入 ！single 进入单局模式, ！match进入比赛模式, 或者输入 ！tag 进行TAG双打");
 
     updateObserversNum();
 
@@ -137,17 +158,126 @@ void WaitingRoom::InsertPlayer(DuelPlayer* dp)
     scpc.status = (dp->type << 4) | PLAYERCHANGE_READY;
     SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
 
-    wchar_t name[20];
-    wchar_t message[256];
-    BufferIO::CopyWStr(dp->name,name,20);
-    std::wstring username(name);
-    swprintf(message, 256, L"积分系统内测中, 你拥有 %d 点积分, 这些积分以后可能会重置", Users::getInstance()->getScore(username));
-    SendMessageToPlayer(dp,message);
-    //SendMessageToPlayer(dp,"到正式版时可能会重置");
-    ExtractPlayer(dp);
-    roomManager->InsertPlayer(dp,MODE_MATCH);
+    //wchar_t name[20];
+    //BufferIO::CopyWStr(dp->name,name,20);
+    //std::wstring username(name);
+    //ExtractPlayer(dp);
+    //roomManager->InsertPlayer(dp,MODE_SINGLE);
+}
 
+void WaitingRoom::JoinGame(char* data, DuelPlayer* dp)
+{
+    char* packet = data;
+    CTOS_JoinGame* pkt = (CTOS_JoinGame*)data;
+    if (pkt->version != PRO_VERSION)
+    {
+        STOC_ErrorMsg scem;
+        scem.msg = ERRMSG_VERROOR;
+        scem.code = PRO_VERSION;
+        SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+        gameServer->DisconnectPlayer(dp);
+        return;
+    }
+    if (pkt->pass[0] == '\0')
+    {
+        InsertPlayer(dp);
+    }
+    else
+    {
+        char room_name[20];
+        if (pkt->pass[0] == 'M' && pkt->pass[1] == '#')
+        {
+            info.rule = 0;
+            info.mode = MODE_MATCH;
+            info.draw_count = 1;
+            info.no_check_deck = false;
+            info.start_hand = 5;
+            info.lflist = 1;
+            info.time_limit = 300;
+            info.start_lp = 8000;
+            info.enable_priority = false;
+            info.no_shuffle_deck = false;
+            memcpy(&(pkt->pass[2]), room_name, 20);      
+        }
+        else if (pkt->pass[0] == 'T' && pkt->pass[1] == '#')
+        {
+            info.rule = 0;
+            info.mode = MODE_TAG;
+            info.draw_count = 1;
+            info.no_check_deck = false;
+            info.start_hand = 5;
+            info.lflist = 1;
+            info.time_limit = 300;
+            info.start_lp = 8000;
+            info.enable_priority = false;
+            info.no_shuffle_deck = false;
+            memcpy(&(pkt->pass[2]), room_name, 20);        
+        }
+        else
+        {
+            std::string misc;
+            misc.append(pkt->pass)
+            std::vector<std::string> sgments = split(misc, ',');
+            if (sgments.size() == 4)
+            {
+                if (sgments[0].size() >= 6)
+                {
+                    std::string configStr = sgments[0];
+                    info.rule = atoi(configStr[0]);
+                    info.mode = atoi(configStr[1]);
+                    info.enable_priority = configStr[2] == 'T' ? true : false;
+                    info.no_check_deck = configStr[3] == 'T' ? true : false;
+                    info.no_shuffle_deck = configStr[4] == 'T' ? true : false;
+                    info.start_lp = atoi(configStr.substr(5, configStr.size() - 5));
+                    info.start_hand = atoi(sgments[1]);
+                    info.draw_count = atoi(sgments[2]);
+                    info.lflist = 1;
+                    info.time_limit = 300;
+                    memcpy(sgments[3].c_str(), room_name, 20);
+                }
+            } else {
+                info.rule=0;
+                info.mode=MODE_SINGLE;
+                info.draw_count=1;
+                info.no_check_deck=false;
+                info.start_hand=5;
+                info.lflist=1;
+                info.time_limit=300;
+                info.start_lp=8000;
+                info.enable_priority=false;
+                info.no_shuffle_deck=false;
+                memcpy(pkt->pass, room_name, 20);
+            }
+        }
+        dp->netServer=this;
+        players[dp] = DuelPlayerInfo();
 
+        unsigned int hash = 1;
+        for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit)
+        {
+            if(info.lflist == lfit->hash)
+            {
+                hash = info.lflist;
+                break;
+            }
+        }
+        if(hash == 1)
+            info.lflist = deckManager._lfList[0].hash;
+
+        dp->type = NETPLAYER_TYPE_PLAYER1;
+
+        STOC_JoinGame scjg;
+        scjg.info=info;
+        SendPacketToPlayer(dp, STOC_JOIN_GAME, scjg);
+
+        STOC_TypeChange sctc;
+        sctc.type = dp->type;
+        SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
+
+        STOC_HS_PlayerEnter scpe;
+        BufferIO::CopyWStr(dp->name, scpe.name, 20);
+        scpe.pos = 0;
+        SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 }
 void WaitingRoom::LeaveGame(DuelPlayer* dp)
 {
@@ -234,13 +364,12 @@ void WaitingRoom::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len)
     }
     case CTOS_JOIN_GAME:
     {
-        InsertPlayer(dp);
+        JoinGame(dp);
         break;
     }
     case CTOS_HS_READY:
     case CTOS_HS_NOTREADY:
     {
-
         playerReadinessChange(dp,CTOS_HS_NOTREADY - pktType);
         break;
     }
