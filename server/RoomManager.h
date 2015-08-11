@@ -13,13 +13,13 @@ private:
     event* keepAliveEvent;
 
     WaitingRoom* waitingRoom;
-    void removeDeadRooms();
+    void RemoveDeadRooms();
     bool FillRoom(CMNetServer* room);
     bool FillAllRooms();
     CMNetServer* CreateRoom(unsigned char mode);
     CMNetServer* CreateRoom(HostInfo *pInfo, const char* name);
     CMNetServer* FindRoom(HostInfo *pInfo, const char* name);
-    static void keepAlive(evutil_socket_t fd, short events, void* arg);
+    static void KeepAlive(evutil_socket_t fd, short events, void* arg);
 public:
     event_base* net_evbase;
     std::list<CMNetServer *> elencoServer;
@@ -33,9 +33,9 @@ public:
     bool InsertPlayer(DuelPlayer*dp);
     bool InsertPlayer(DuelPlayer*dp,unsigned char mode);
     bool CreateOrJoinRoom(DuelPlayer*dp, HostInfo *pInfo, const char* name);
-    CMNetServer* getFirstAvailableRoom();
-    CMNetServer* getFirstAvailableRoom(unsigned char mode);
-    int getNumPlayers();
+    CMNetServer* GetFirstAvailableRoom();
+    CMNetServer* GetFirstAvailableRoom(unsigned char mode);
+    int GetNumPlayers();
 };
 
 }

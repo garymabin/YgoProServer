@@ -6,15 +6,13 @@
 namespace ygo
 {
 
-
-
 void RoomManager::setGameServer(GameServer* gs)
 {
     gameServer = gs;
 
     net_evbase = gs->net_evbase;
     timeval timeout = {5, 0};
-    keepAliveEvent = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, keepAlive, this);
+    keepAliveEvent = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, KeepAlive, this);
     waitingRoom = new WaitingRoom(this,gs);
     event_add(keepAliveEvent, &timeout);
 }
@@ -29,16 +27,15 @@ RoomManager::~RoomManager()
     delete waitingRoom;
 }
 
-
-void RoomManager::keepAlive(evutil_socket_t fd, short events, void* arg)
+void RoomManager::KeepAlive(evutil_socket_t fd, short events, void* arg)
 {
     RoomManager*that = (RoomManager*) arg;
-    that->removeDeadRooms();
+    that->RemoveDeadRooms();
     that->FillAllRooms();
 }
 
 
-int RoomManager::getNumPlayers()
+int RoomManager::GetNumPlayers()
 {
     int risultato = 0;
     risultato += waitingRoom->getNumPlayers();
@@ -49,7 +46,7 @@ int RoomManager::getNumPlayers()
     return risultato;
 }
 
-CMNetServer* RoomManager::getFirstAvailableRoom(unsigned char mode)
+CMNetServer* RoomManager::GetFirstAvailableRoom(unsigned char mode)
 {
     int i = 0;
     log(INFO,"analizzo la lista server\n");
@@ -72,7 +69,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp)
 {
 
     //tfirst room
-    CMNetServer* netServer = getFirstAvailableRoom();
+    CMNetServer* netServer = GetFirstAvailableRoom();
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
@@ -138,7 +135,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp,unsigned char mode)
 {
 
     //true is success
-    CMNetServer* netServer = getFirstAvailableRoom(mode);
+    CMNetServer* netServer = GetFirstAvailableRoom(mode);
     if(netServer == nullptr)
     {
         waitingRoom->InsertPlayer(dp);
@@ -164,9 +161,13 @@ bool RoomManager::CreateOrJoinRoom(DuelPlayer*dp, HostInfo *pInfo, const char* n
     return true;
 }
 
-static inline bool compareHostInfo(HostInfo *pInfo1, HostInfo * pInfo2)
+static inline bool CompareHostInfo(HostInfo *pInfo1, HostInfo * pInfo2)
 {
-    return memcmp(pInfo1, pInfo2, sizeof(HostInfo)) == 0;
+    return pInfo1->mode == pInfo2->mode && pInfo1->rule == pInfo2->rule
+     && pInfo1->start_lp == pInfo2->start_lp && pInfo1->no_check_deck == pInfo2->no_check_deck
+     && pInfo1->no_shuffle_deck == pInfo2->no_shuffle_deck && pInfo1->enable_priority == pInfo2->enable_priority 
+     && pInfo1->start_hand == pInfo2->start_hand && pInfo1->draw_count == pInfo2->draw_count
+     && pInfo1->time_limit == pInfo2->time_limit && pInfo1->lflist == pInfo2->lflist;
 }
     
 
@@ -177,7 +178,7 @@ CMNetServer* RoomManager::FindRoom(HostInfo *pInfo, const char* name)
     for(auto it =elencoServer.begin(); it!=elencoServer.end(); ++it)
     {
         CMNetServer *p = *it;
-        if(compareHostInfo(&p->duel_mode->host_info, pInfo) && (strcmp(name, p->serverName.c_str()) == 0))
+        if(CompareHostInfo(&p->duel_mode->host_info, pInfo) && (strcmp(name, p->serverName.c_str()) == 0))
         {
             return *it;
         }
@@ -186,21 +187,18 @@ CMNetServer* RoomManager::FindRoom(HostInfo *pInfo, const char* name)
     return nullptr;
 }
 
-CMNetServer* RoomManager::getFirstAvailableRoom()
+CMNetServer* RoomManager::GetFirstAvailableRoom()
 {
     int i = 0;
-    log(INFO,"analizzo la lista server\n");
     for(auto it =elencoServer.begin(); it!=elencoServer.end(); ++it)
     {
         CMNetServer *p = *it;
         if(p->state == CMNetServer::State::WAITING)
         {
-            log(INFO,"ho scelto il server %d\n",i);
             return *it;
         }
         i++;
     }
-    log(INFO,"Server non trovato, creo uno nuovo \n");
     return CreateRoom(MODE_SINGLE);
 }
 
@@ -234,18 +232,17 @@ CMNetServer* RoomManager::CreateRoom(HostInfo *pInfo, const char *name)
     return netServer;
 }
 
-void RoomManager::removeDeadRooms()
+void RoomManager::RemoveDeadRooms()
 {
 
     int i=0;
-    //log(INFO,"analizzo la lista server e cerco i morti\n");
     for(auto it =elencoServer.begin(); it!=elencoServer.end();)
     {
         CMNetServer *p = *it;
 
         if(p->state == CMNetServer::State::DEAD)
         {
-            log(INFO,"elimino il server %d\n",i);
+            log(INFO,"remove dead room %d\n",i);
             delete (*it);
             it=elencoServer.erase(it);
         }

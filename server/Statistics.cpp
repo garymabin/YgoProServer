@@ -15,7 +15,7 @@ namespace ygo
 {
 Statistics::Statistics():numPlayers(0),numRooms(0)
 {
-    Thread::NewThread(StatisticsThread, this);
+    //Thread::NewThread(StatisticsThread, this);
 }
 Statistics* Statistics::getInstance()
 {

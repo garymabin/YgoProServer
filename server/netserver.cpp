@@ -45,7 +45,6 @@ void CMNetServer::SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* 
         unsigned char* wbuf = (unsigned char*)buffer;
         if(wbuf[0] == MSG_WIN)
         {
-            log(INFO,"---------vittoria per il giocatore\n");
             last_winner =wbuf[1];
         }
         if(wbuf[0] == MSG_START && dp->type != NETPLAYER_TYPE_OBSERVER)
@@ -353,7 +352,6 @@ void CMNetServer::Victory(unsigned char winner)
 
         }
         Users::getInstance()->Victory(std::wstring(win1),std::wstring(win2),std::wstring(lose1),std::wstring(lose2));
-        //log(INFO,"Tagduel finished: winners %s and %s, losers: %s and %s\n",win1,win2,lose1,lose2);
     }
 }
 
