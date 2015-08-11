@@ -8,6 +8,9 @@
 #include <errno.h>
 #include <netinet/tcp.h>
 #include "debug.h"
+
+const unsigned short PRO_VERSION = 0x1335;
+
 namespace ygo
 {
 GameServer::GameServer()
@@ -205,9 +208,7 @@ void GameServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len)
         log(INFO,"rommmanager: there are %d players\n",wnumplayers+1);
     }
 
-
     dp->netServer->HandleCTOSPacket(dp,data,len);
-
     return;
 
 }

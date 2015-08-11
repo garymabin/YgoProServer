@@ -11,13 +11,11 @@
 
 #include "netserver.h"
 
-const unsigned short PRO_VERSION = 0x12f0;
-
 namespace ygo {
-
+    
 class GameServer {
 private:
-	std::unordered_map<bufferevent*, DuelPlayer> users;
+	 std::unordered_map<bufferevent*, DuelPlayer> users;
 	 unsigned short server_port;
 	 evconnlistener* listener;
 
@@ -29,17 +27,16 @@ public:
     event_base* volatile net_evbase;
     RoomManager roomManager;
     GameServer();
-	 bool StartServer(unsigned short port);
-	 void StopServer();
-	 void StopListen();
-	 static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
-	 static void ServerAcceptError(evconnlistener *listener, void* ctx);
-	 static void ServerEchoRead(bufferevent* bev, void* ctx);
-	 static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
-	 static int ServerThread(void* param);
-	 void DisconnectPlayer(DuelPlayer* dp);
-	 void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
-
+    bool StartServer(unsigned short port);
+    void StopServer();
+    void StopListen();
+    static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
+    static void ServerAcceptError(evconnlistener *listener, void* ctx);
+    static void ServerEchoRead(bufferevent* bev, void* ctx);
+    static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
+    static int ServerThread(void* param);
+    void DisconnectPlayer(DuelPlayer* dp);
+    void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
 };
 
 }

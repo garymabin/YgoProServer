@@ -65,7 +65,7 @@ CMNetServer* RoomManager::getFirstAvailableRoom(unsigned char mode)
         i++;
     }
     log(INFO,"Server non trovato, creo uno nuovo \n");
-    return createRoom(mode);
+    return CreateRoom(mode);
 }
 
 bool RoomManager::InsertPlayer(DuelPlayer*dp)
@@ -89,7 +89,7 @@ bool RoomManager::InsertPlayer(DuelPlayer*dp)
 bool RoomManager::FillRoom(CMNetServer* room)
 {
 
-    if(room->state!= CMNetServer::State::WAITING)
+    if(room->state != CMNetServer::State::WAITING)
         return true;
 
     for(DuelPlayer* base = room->getFirstPlayer(); room->state!= CMNetServer::State::FULL;)
@@ -160,7 +160,8 @@ bool RoomManager::CreateOrJoinRoom(DuelPlayer*dp, HostInfo *pInfo, const char* n
         room = CreateRoom(pInfo, name);
     }
     dp->netServer = room;
-    netServer->InsertPlayer(dp);
+    room->InsertPlayer(dp);
+    return true;
 }
 
 static inline bool compareHostInfo(HostInfo *pInfo1, HostInfo * pInfo2)
@@ -200,10 +201,10 @@ CMNetServer* RoomManager::getFirstAvailableRoom()
         i++;
     }
     log(INFO,"Server non trovato, creo uno nuovo \n");
-    return createRoom(MODE_SINGLE);
+    return CreateRoom(MODE_SINGLE);
 }
 
-CMNetServer* RoomManager::createRoom(unsigned char mode)
+CMNetServer* RoomManager::CreateRoom(unsigned char mode)
 {
     if(elencoServer.size() >= 500)
     {
@@ -218,7 +219,7 @@ CMNetServer* RoomManager::createRoom(unsigned char mode)
     return netServer;
 }
 
-CMNetServer* RoomManager::createRoom(HostInfo *pInfo, const char *name)
+CMNetServer* RoomManager::CreateRoom(HostInfo *pInfo, const char *name)
 {
     if(elencoServer.size() >= 500)
     {

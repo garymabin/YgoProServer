@@ -23,6 +23,7 @@ public:
     void ExtractPlayer(DuelPlayer* dp);
     void InsertPlayer(DuelPlayer* dp);
     void LeaveGame(DuelPlayer* dp);
+    void JoinGame(char* data, DuelPlayer* dp);
     void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
 
 

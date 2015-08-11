@@ -9,6 +9,9 @@
 #include "NetServerInterface.h"
 #include "field.h"
 #include <mutex>
+
+extern const unsigned short PRO_VERSION;
+
 namespace ygo
 {
 class GameServer;
@@ -20,23 +23,19 @@ public:
     unsigned char mode;
     enum State { WAITING, FULL, PLAYING,ZOMBIE, DEAD};
     State state;
+    DuelMode* duel_mode;
+    std::string serverName;
 private:
+    event* auto_idle;
+    int numPlayers;
+    
     static void DuelTimer(evutil_socket_t fd, short events, void* arg);
-
     void Victory(unsigned char winner);
     unsigned char last_winner;
     int getNumDuelPlayers();
     void updateServerState();
     void destroyGame();
-    event* auto_idle;
     static void auto_idle_cb(evutil_socket_t fd, short events, void* arg);
-
-    DuelMode* duel_mode;
-
-    int numPlayers;
-    
-    std::string serverName;
-
     void playerConnected(DuelPlayer* dp);
     void playerDisconnected(DuelPlayer* dp);
     int getMaxDuelPlayers();
